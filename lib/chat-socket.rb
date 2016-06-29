@@ -48,8 +48,10 @@ class ChatWebSocket < WebSocketHelper
 		end
 
 		data[:username] = self.username
+		data[:content] = data[:content].to_s.truncate(256)
+
 		self.send_room 'chat', data
-		log_action 'chat'
+		log_action 'chat', :description => data[:content]
 
 		self.chat_banned = @rateWindow.banned? 
 		@rateWindow.inc
