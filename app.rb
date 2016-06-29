@@ -10,6 +10,7 @@ require 'time'
 require './config/app.config'
 require './lib/extensions'
 require './lib/chat-socket'
+require './lib/models'
 
 #use Rack::Deflater
 set :git_path, development? ? './.git' : '/home/reednj/code/asteroids.git/.git'
@@ -22,21 +23,13 @@ configure :development do
 	# need this to make it possible to debug the websockets, otherwise exceptions just get silently
 	# swallowed
 	Thread.abort_on_exception = true
+
+	also_reload './lib/chat-socket.rb'
+	also_reload './lib/models.rb'
 end
 
 configure :production do
-	set :facebook_app_id, '1716215681933302'
 
-	# only log this on prod, as every flie change triggers it in development
-	DB.ext.log_action 'app_startup', :description => settings.version
-end
-
-configure do
-	# the models need to be initialized after the DB const is set, so do that now
-	# it needs a separate connection, or it fucks up the normal entity queries for
-	# some reason
-	Sequel::Model.db = Sequel::Database.connect AppConfig.db
-	require './lib/models'
 end
 
 # generic helpers - we could moe these out into their own file later
@@ -55,10 +48,13 @@ helpers do
 
 end
 
-get '/api/ws' do
+get '/chat/:room' do |room|
 	return 'websockets only' if !request.websocket?
 	request.websocket do |ws|
-		ChatWebSocket.new ws,  { }
+		ChatWebSocket.new ws,  { 
+			:username => params[:username],
+			:room => room
+		}
 	end
 
 end
