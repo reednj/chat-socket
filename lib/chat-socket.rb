@@ -13,19 +13,33 @@ class ChatWebSocket < WebSocketHelper
 
 		self.username = options[:username] || nil
 		self.room = options[:room] || 'default'
+
+		self.username = nil if self.username.empty?
 	end
 
 	def on_open
 		super
 		log_action 'chat_connect'
-		self.send_system_chat 'xx chatting, xx watching'
+		self.send_system_chat "#{chatting_count} chatting, #{connected_count-chatting_count} watching"
 	end
 
 	def on_chat(data)
-		return if self.username.nil?
+		return unless can_chat?
 		data[:username] = self.username
 		self.send_room 'chat', data
 		log_action 'chat'
+	end
+
+	def chatting_count
+		@sockets.select{|s| s.can_chat? }.length
+	end
+
+	def connected_count
+		@sockets.length
+	end
+
+	def can_chat?
+		!self.username.nil?
 	end
 
 	def log_action(action_name, options={})
@@ -35,7 +49,7 @@ class ChatWebSocket < WebSocketHelper
 	end
 
 	def send_system_chat(message)
-		self.send_room 'chat', {
+		self.send 'chat', {
 			:username => 'system',
 			:content => message.to_s
 		}
