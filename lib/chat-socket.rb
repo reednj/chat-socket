@@ -21,7 +21,7 @@ class ChatWebSocket < WebSocketHelper
 
 	def on_open
 		super
-		log_action 'chat_connect'
+		log_action 'chat_connect', :description => "#{chatting_count}/#{connected_count}"
 		self.send_system_chat "#{chatting_count} chatting, #{connected_count-chatting_count} watching"
 		self.send_counts
 	end
