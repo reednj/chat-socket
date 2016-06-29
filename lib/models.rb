@@ -17,7 +17,18 @@ class ActionLog < Sequel::Model(:action_log)
 			a.action_desc = description
 		}
 	end
-
+    
+    def self.log(action_name, options = {})
+        a = self.new { |a|
+			a.action_name = action_name
+			a.action_desc = options[:description] || nil
+            a.username = options[:username] || nil
+            a.thread_id = options[:thread_id] || nil
+		}
+        a.save
+        return a
+    end
+ 
 	dataset_module do
 
 		def with_name(n)

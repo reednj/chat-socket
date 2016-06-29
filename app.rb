@@ -50,9 +50,14 @@ end
 
 get '/chat/:room' do |room|
 	return 'websockets only' if !request.websocket?
+
+	username = params[:username]
+	key = "com.reednj.jones.#{room}.#{username}".sha1
+	halt_with_text 403, 'invalid key' if key != params[:key]
+
 	request.websocket do |ws|
 		ChatWebSocket.new ws,  { 
-			:username => params[:username],
+			:username => username,
 			:room => room
 		}
 	end

@@ -15,10 +15,22 @@ class ChatWebSocket < WebSocketHelper
 		self.room = options[:room] || 'default'
 	end
 
+	def on_open
+		super
+		log_action 'chat_connect'
+	end
+
 	def on_chat(data)
 		return if self.username.nil?
 		data[:username] = self.username
 		self.send_room 'chat', data
+		log_action 'chat'
+	end
+
+	def log_action(action_name, options={})
+		options[:username] = self.username
+		options[:thread_id] = self.room
+		ActionLog.log action_name, options
 	end
 
 	def send_room(event, data)
