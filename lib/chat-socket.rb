@@ -18,6 +18,7 @@ class ChatWebSocket < WebSocketHelper
 	def on_open
 		super
 		log_action 'chat_connect'
+		self.send_system_chat 'xx chatting, xx watching'
 	end
 
 	def on_chat(data)
@@ -31,6 +32,13 @@ class ChatWebSocket < WebSocketHelper
 		options[:username] = self.username
 		options[:thread_id] = self.room
 		ActionLog.log action_name, options
+	end
+
+	def send_system_chat(message)
+		self.send_room 'chat', {
+			:username => 'system',
+			:content => message.to_s
+		}
 	end
 
 	def send_room(event, data)
