@@ -63,6 +63,10 @@ class ChatWebSocket < WebSocketHelper
 		log_action 'chat_ban', :description => ban_length 
 	end
 
+	def on_ping(data)
+		self.send 'pong', data
+	end
+
 	def chatting_count
 		room_sockets.select{|s| s.can_chat? }.length
 	end
