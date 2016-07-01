@@ -59,7 +59,7 @@ class ChatWebSocket < WebSocketHelper
 	end
 
 	def on_user_banned(ban_length)
-		self.send_system_chat 'you are doing that too fast. take a break for a minute'
+		self.send_system_chat 'you are doing that too much. take a break for a minute'
 		log_action 'chat_ban', :description => ban_length 
 	end
 
