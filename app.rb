@@ -12,10 +12,6 @@ require './lib/extensions'
 require './lib/chat-socket'
 require './lib/models'
 
-#use Rack::Deflater
-set :git_path, development? ? './.git' : '/home/reednj/code/asteroids.git/.git'
-set :version, GitVersion.current(settings.git_path)
-
 configure :development do
 	set :server, :thin
 	set :port, 4568
