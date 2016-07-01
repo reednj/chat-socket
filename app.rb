@@ -11,6 +11,8 @@ require './lib/extensions'
 require './lib/chat-socket'
 require './lib/models'
 
+set :version, GitVersion.current(development? ? './.git' : '/home/reednj/code/chat.git/.git')
+
 configure :development do
 	set :server, :thin
 	set :port, 4568
@@ -44,7 +46,7 @@ helpers do
 end
 
 get '/' do
-	halt_with_text 200, 'hello'
+	halt_with_text 200, "hello (#{settings.version})"
 end
 
 get '/chat/:room' do |room|
