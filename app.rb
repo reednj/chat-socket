@@ -4,7 +4,6 @@ require "sinatra/reloader" if development?
 
 require 'sequel'
 require 'json'
-require 'haml'
 require 'time'
 
 require './config/app.config'
@@ -42,6 +41,10 @@ helpers do
 		halt code, {'Content-Type' => 'text/plain'}, message
 	end
 
+end
+
+get '/' do
+	halt_with_text 200, 'hello'
 end
 
 get '/chat/:room' do |room|
