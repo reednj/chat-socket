@@ -49,6 +49,7 @@ class ChatWebSocket < WebSocketHelper
 
 		data[:username] = self.username
 		data[:content] = data[:content].to_s.truncate(256)
+		data[:color] = self.username.as_color
 
 		self.send_room 'chat', data
 		log_action 'chat', :description => data[:content]

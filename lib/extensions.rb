@@ -222,6 +222,10 @@ end
 require 'digest/sha1'
 
 class String
+	def as_color
+		'#' + self.sha1[0...6]
+	end
+
 	def self.rand(len = 8)
 		d = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
 		return (0..len).to_a.map { d.rand }.join ''
