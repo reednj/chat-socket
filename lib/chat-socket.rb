@@ -3,6 +3,32 @@ require 'cgi'
 require './lib/websocket'
 require './lib/models'
 
+class ChatHistory
+	attr_accessor :room
+
+	@@data = {}
+
+	def initialize(room)
+		self.room = room
+	end
+
+	def data
+		@@data[room] ||= []
+	end
+
+	def add(username, content)
+		msg = {
+			:username => username,
+			:content => content,
+			:color => username.as_color,
+			:created_date => Time.now
+		}
+
+		self.data.push msg
+	end
+
+end
+
 class ChatWebSocket < WebSocketHelper
 	attr_accessor :username
 	attr_accessor :room
@@ -17,6 +43,7 @@ class ChatWebSocket < WebSocketHelper
 		self.username = nil if self.username.empty?
 
 		@rateWindow = SocketRateWindows.new
+		@history = ChatHistory.new self.room
 	end
 
 	def on_open
@@ -29,6 +56,8 @@ class ChatWebSocket < WebSocketHelper
 				:username => 'system',
 				:content => "#{self.username} just joined. say hi!"
 			}
+
+			self.send_history
 
 			log_action 'chat_connect', :description => "#{chatting_count}/#{connected_count}"
 		end
@@ -60,6 +89,7 @@ class ChatWebSocket < WebSocketHelper
 		data[:color] = self.username.as_color
 
 		self.send_room 'chat', data
+		@history.add self.username, data[:content]
 		log_action 'chat', :description => data[:content]
 
 		self.chat_banned = @rateWindow.banned? 
@@ -95,6 +125,10 @@ class ChatWebSocket < WebSocketHelper
 		options[:username] = self.username
 		options[:thread_id] = self.room
 		ActionLog.log action_name, options
+	end
+
+	def send_history
+		self.send 'history', @history.data.first(100)
 	end
 
 	def send_counts
