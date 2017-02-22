@@ -14,6 +14,7 @@ mkdir $WEB/tmp
 mkdir $WEB/public
 
 # restart the server
-sudo -u www-data thin --config /etc/thin/chat.reednj.com.yml restart > $WEB/tmp/thin-restart.log &
+cd $WEB
+sudo -u www-data bundle exec thin --config /etc/thin/chat.reednj.com.yml restart > $WEB/tmp/thin-restart.log &
 
 echo "Website deployed"
